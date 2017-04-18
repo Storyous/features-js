@@ -1,7 +1,7 @@
 {
   "name": "st-features",
   "version": "1.0.0",
-  "main": "./index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "npm run test:lint && npm run test:coverage && npm run test:coverage:threshold",
     "test:coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- --opts ./mocha.opts ./test",
