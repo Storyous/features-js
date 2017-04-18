@@ -59,12 +59,12 @@ class Features {
          */
         this._cacheLifetime = options.cacheLifetime == null ? null : options.cacheLifetime;
 
-        this._loadDefinitionsRepetitively();
+        this.firstLoadPromise = this._loadDefinitionsRepetitively();
     }
 
     _loadDefinitionsRepetitively () {
         let lastValue;
-        this._providers.reduce(
+        return this._providers.reduce(
             (previous, provider) => previous.then(
                 (def) => {
                     lastValue = def;
@@ -89,6 +89,13 @@ class Features {
                 );
             }
         });
+    }
+
+    /**
+     * @returns {Promise}
+     */
+    getReadyPromise () {
+        return this.firstLoadPromise;
     }
 
     destroy () {
