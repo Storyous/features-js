@@ -59,7 +59,7 @@ class Features {
          */
         this._cacheLifetime = options.cacheLifetime == null ? null : options.cacheLifetime;
 
-        this.firstLoadPromise = this._loadDefinitionsRepetitively();
+        this._firstLoadPromise = this._loadDefinitionsRepetitively();
     }
 
     _loadDefinitionsRepetitively () {
@@ -95,9 +95,12 @@ class Features {
      * @returns {Promise}
      */
     getReadyPromise () {
-        return this.firstLoadPromise;
+        return this._firstLoadPromise;
     }
 
+    /**
+     * @returns {void}
+     */
     destroy () {
         if (this._timeoutId !== null) {
             clearTimeout(this._timeoutId);
