@@ -66,7 +66,7 @@ var Features = function () {
          */
         this._cacheLifetime = options.cacheLifetime == null ? null : options.cacheLifetime;
 
-        this._loadDefinitionsRepetitively();
+        this.firstLoadPromise = this._loadDefinitionsRepetitively();
     }
 
     _createClass(Features, [{
@@ -75,7 +75,7 @@ var Features = function () {
             var _this = this;
 
             var lastValue = void 0;
-            this._providers.reduce(function (previous, provider) {
+            return this._providers.reduce(function (previous, provider) {
                 return previous.then(function (def) {
                     lastValue = def;
                     return provider(def);
@@ -95,6 +95,16 @@ var Features = function () {
                     }, _this._cacheLifetime);
                 }
             });
+        }
+
+        /**
+         * @returns {Promise}
+         */
+
+    }, {
+        key: 'getReadyPromise',
+        value: function getReadyPromise() {
+            return this.firstLoadPromise;
         }
     }, {
         key: 'destroy',
