@@ -66,7 +66,7 @@ var Features = function () {
          */
         this._cacheLifetime = options.cacheLifetime == null ? null : options.cacheLifetime;
 
-        this.firstLoadPromise = this._loadDefinitionsRepetitively();
+        this._firstLoadPromise = this._loadDefinitionsRepetitively();
     }
 
     _createClass(Features, [{
@@ -104,8 +104,13 @@ var Features = function () {
     }, {
         key: 'getReadyPromise',
         value: function getReadyPromise() {
-            return this.firstLoadPromise;
+            return this._firstLoadPromise;
         }
+
+        /**
+         * @returns {void}
+         */
+
     }, {
         key: 'destroy',
         value: function destroy() {
