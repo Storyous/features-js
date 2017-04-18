@@ -23,6 +23,7 @@ var Features = function () {
      *    providers: DefinitionProvider[]
      *    cacheLifetime: number|null,
      *    onError?: Function
+     *    onDefinitionsChange?: Function
      * }} options
      * @param {FeatureDefinitions} [initialValue={}]
      */
@@ -54,7 +55,7 @@ var Features = function () {
         /**
          * @type {Function}
          */
-        this._onError = options.onError;
+        this._onError = options.onError || null;
 
         /**
          * @type {number}
@@ -65,6 +66,11 @@ var Features = function () {
          * @type {number}
          */
         this._cacheLifetime = options.cacheLifetime == null ? null : options.cacheLifetime;
+
+        /**
+         * @type {Function}
+         */
+        this._onDefinitionsChange = options.onDefinitionsChange || null;
 
         this._firstLoadPromise = this._loadDefinitionsRepetitively();
     }
@@ -88,6 +94,9 @@ var Features = function () {
             }, Promise.resolve(null)).then(function (def) {
                 if (def) {
                     _this._currentDefinitions = def;
+                    if (_this._onDefinitionsChange) {
+                        _this._onDefinitionsChange(def);
+                    }
                 }
                 if (typeof _this._cacheLifetime === 'number') {
                     _this._timeoutId = setTimeout(function () {

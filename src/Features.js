@@ -19,6 +19,7 @@ class Features {
      *    providers: DefinitionProvider[]
      *    cacheLifetime: number|null,
      *    onError?: Function
+     *    onDefinitionsChange?: Function
      * }} options
      * @param {FeatureDefinitions} [initialValue={}]
      */
@@ -47,7 +48,7 @@ class Features {
         /**
          * @type {Function}
          */
-        this._onError = options.onError;
+        this._onError = options.onError || null;
 
         /**
          * @type {number}
@@ -58,6 +59,11 @@ class Features {
          * @type {number}
          */
         this._cacheLifetime = options.cacheLifetime == null ? null : options.cacheLifetime;
+
+        /**
+         * @type {Function}
+         */
+        this._onDefinitionsChange = options.onDefinitionsChange || null;
 
         this._firstLoadPromise = this._loadDefinitionsRepetitively();
     }
@@ -81,6 +87,9 @@ class Features {
         ).then((def) => {
             if (def) {
                 this._currentDefinitions = def;
+                if (this._onDefinitionsChange) {
+                    this._onDefinitionsChange(def);
+                }
             }
             if (typeof this._cacheLifetime === 'number') {
                 this._timeoutId = setTimeout(
