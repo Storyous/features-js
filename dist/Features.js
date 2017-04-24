@@ -89,7 +89,7 @@ var Features = function () {
                     if (_this._onError) {
                         _this._onError(err);
                     }
-                    return provider(lastValue);
+                    return lastValue;
                 });
             }, Promise.resolve(null)).then(function (def) {
                 if (def) {

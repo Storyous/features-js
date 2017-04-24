@@ -78,7 +78,7 @@ class Features {
                     if (this._onError) {
                         this._onError(err);
                     }
-                    return provider(lastValue);
+                    return lastValue;
                 }
             ),
             Promise.resolve(null)
