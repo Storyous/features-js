@@ -70,13 +70,11 @@ class Features {
 
     _loadDefinitionsRepetitively () {
         let lastValue;
-        return this._providers.reduce(
-            (previous, provider) => previous.then(
-                (def) => {
+        return this._providers.reduce((previous, provider) =>
+                previous.then((def) => {
                     lastValue = def;
                     return provider(def);
-                },
-                (err) => {
+                }).catch((err) => {
                     if (this._onError) {
                         this._onError(err);
                     }

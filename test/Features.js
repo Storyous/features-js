@@ -81,6 +81,26 @@ describe('Features', function () {
 
     });
 
+    it('should do another request if last provider fails', function () {
+
+        const provider1 = sinon.spy(() => Promise.reject(new Error('Some error')));
+
+        features = new Features({
+            defaultValue: false,
+            environment: 'production',
+            cacheLifetime: 1,
+            providers: [
+                provider1
+            ]
+        });
+
+        return wait(100).then(() => {
+            assert(provider1.callCount > 1, 'The provider1 should be called at least once');
+            assert.strictEqual(features.enabled('featureAsBool'), false);
+        });
+
+    });
+
     it('should propagate data from previous successful provider', function () {
 
         const definitions = {

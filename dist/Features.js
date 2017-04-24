@@ -85,7 +85,7 @@ var Features = function () {
                 return previous.then(function (def) {
                     lastValue = def;
                     return provider(def);
-                }, function (err) {
+                }).catch(function (err) {
                     if (_this._onError) {
                         _this._onError(err);
                     }
