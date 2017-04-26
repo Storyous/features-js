@@ -130,12 +130,18 @@ var Features = function () {
         }
 
         /**
+         * @param {Function} [processFunction]
          * @returns {FeatureDefinitions}
          */
 
     }, {
         key: 'getFeatureDefinitions',
-        value: function getFeatureDefinitions() {
+        value: function getFeatureDefinitions(processFunction) {
+
+            if (typeof processFunction === 'function') {
+                return processFunction(this._currentDefinitions);
+            }
+
             return this._currentDefinitions;
         }
 
