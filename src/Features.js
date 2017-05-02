@@ -116,9 +116,15 @@ class Features {
     }
 
     /**
+     * @param {Function} [processFunction]
      * @returns {FeatureDefinitions}
      */
-    getFeatureDefinitions () {
+    getFeatureDefinitions (processFunction) {
+
+        if (typeof processFunction === 'function') {
+            return processFunction(this._currentDefinitions);
+        }
+
         return this._currentDefinitions;
     }
 
