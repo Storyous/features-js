@@ -22,17 +22,14 @@ var Features = function () {
      *    onError?: Function
      *    onDefinitionsChange?: Function
      * }} options
-     * @param {FeatureDefinitions} [initialValue={}]
      */
     function Features(options) {
-        var initialValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
         _classCallCheck(this, Features);
 
         /**
          * @type {FeatureDefinitions}
          */
-        this._currentDefinitions = initialValue;
+        this._currentDefinitions = { null: {} };
 
         /**
          * @type {DefinitionProvider}
@@ -67,7 +64,9 @@ var Features = function () {
         value: function _loadDefinitionsRepetitively() {
             var _this = this;
 
-            return this._provider().then(function (def) {
+            return this._provider().catch(function () {
+                return null;
+            }).then(function (def) {
                 if (def) {
                     _this._currentDefinitions = def;
                     if (_this._onDefinitionsChange) {
@@ -117,9 +116,9 @@ var Features = function () {
             var id = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'null';
 
             if (id in this._currentDefinitions) {
-                return this._currentDefinitions[id][key];
+                return this._currentDefinitions[id][key] || false;
             }
-            return this._currentDefinitions.null[key];
+            return this._currentDefinitions.null[key] || false;
         }
     }]);
 

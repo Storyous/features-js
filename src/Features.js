@@ -18,14 +18,13 @@ class Features {
      *    onError?: Function
      *    onDefinitionsChange?: Function
      * }} options
-     * @param {FeatureDefinitions} [initialValue={}]
      */
-    constructor (options, initialValue = {}) {
+    constructor (options) {
 
         /**
          * @type {FeatureDefinitions}
          */
-        this._currentDefinitions = initialValue;
+        this._currentDefinitions = { null: {} };
 
         /**
          * @type {DefinitionProvider}
@@ -57,6 +56,7 @@ class Features {
 
     _loadDefinitionsRepetitively () {
         return this._provider()
+            .catch(() => null)
             .then((def) => {
                 if (def) {
                     this._currentDefinitions = def;
@@ -97,9 +97,9 @@ class Features {
      */
     enabled (key, id = 'null') {
         if (id in this._currentDefinitions) {
-            return this._currentDefinitions[id][key];
+            return this._currentDefinitions[id][key] || false;
         }
-        return this._currentDefinitions.null[key];
+        return this._currentDefinitions.null[key] || false;
     }
 
 }

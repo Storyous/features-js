@@ -30,16 +30,20 @@ describe('mongoProviderFactory', function () {
     });
 
     it('should return and save previous value if exists', function () {
-        const expectedData = { featureId: ['production'] };
+        const expectedData = { null: { featureId: true } };
         const provider = mongoProviderFactory(collection, id);
 
-        return provider(expectedData).then((data) => {
-            assert.deepEqual(data, expectedData, 'Definition while saving does not match');
+        return collection.insertOne(Object.assign({ _id: id }, expectedData))
+            .then(() => provider())
+            .then((data) => {
 
-            return provider();
-        }).then((data) => {
-            assert.deepEqual(data, expectedData, 'Definition with loading does not match');
-        });
+                assert.deepEqual(data, expectedData, 'Definition while saving does not match');
+
+                return provider();
+            })
+            .then((data) => {
+                assert.deepEqual(data, expectedData, 'Definition with loading does not match');
+            });
     });
 
 

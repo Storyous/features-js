@@ -3,6 +3,7 @@
 var Features = require('./Features');
 var mongoProviderFactory = require('./mongoProviderFactory');
 var urlProviderFactory = require('./urlProviderFactory');
+var runFetchToMongoTask = require('./runFetchToMongoTask');
 
 module.exports = {
 
@@ -10,6 +11,8 @@ module.exports = {
 
     mongoProviderFactory: mongoProviderFactory,
 
-    urlProviderFactory: urlProviderFactory
+    urlProviderFactory: urlProviderFactory,
+
+    runFetchToMongoTask: runFetchToMongoTask
 
 };
