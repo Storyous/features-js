@@ -43,5 +43,9 @@
   "directories": {
     "test": "test"
   },
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "cronious": "^1.6.0",
+    "node-fetch": "^1.7.1"
+  }
 }

@@ -1,12 +1,11 @@
 'use strict';
 
 /**
- * @typedef {Object.<string, string[]|boolean>} FeatureDefinitions
+ * @typedef {Object.<string, Object.<string, boolean>>} FeatureDefinitions
  */
 
 /**
  * @callback DefinitionProvider
- * @param {FeatureDefinitions} [freshDefinitions=null]
  * @returns {Promise.<FeatureDefinitions>}
  */
 
@@ -18,9 +17,7 @@ var Features = function () {
 
     /**
      * @param {{
-     *    defaultValue: *
-     *    environment: string
-     *    providers: DefinitionProvider[]
+     *    provider: DefinitionProvider
      *    cacheLifetime: number|null,
      *    onError?: Function
      *    onDefinitionsChange?: Function
@@ -38,19 +35,9 @@ var Features = function () {
         this._currentDefinitions = initialValue;
 
         /**
-         * @type {string}
+         * @type {DefinitionProvider}
          */
-        this._environment = options.environment;
-
-        /**
-         * @type {*}
-         */
-        this._defaultValue = options.defaultValue;
-
-        /**
-         * @type {DefinitionProvider[]}
-         */
-        this._providers = options.providers;
+        this._provider = options.provider;
 
         /**
          * @type {Function}
@@ -58,7 +45,7 @@ var Features = function () {
         this._onError = options.onError || null;
 
         /**
-         * @type {number}
+         * @type {number|null}
          */
         this._timeoutId = null;
 
@@ -80,18 +67,7 @@ var Features = function () {
         value: function _loadDefinitionsRepetitively() {
             var _this = this;
 
-            var lastValue = void 0;
-            return this._providers.reduce(function (previous, provider) {
-                return previous.then(function (def) {
-                    lastValue = def;
-                    return provider(def);
-                }).catch(function (err) {
-                    if (_this._onError) {
-                        _this._onError(err);
-                    }
-                    return lastValue;
-                });
-            }, Promise.resolve(null)).then(function (def) {
+            return this._provider().then(function (def) {
                 if (def) {
                     _this._currentDefinitions = def;
                     if (_this._onDefinitionsChange) {
@@ -130,42 +106,20 @@ var Features = function () {
         }
 
         /**
-         * @param {Function} [processFunction]
-         * @returns {FeatureDefinitions}
-         */
-
-    }, {
-        key: 'getFeatureDefinitions',
-        value: function getFeatureDefinitions(processFunction) {
-
-            if (typeof processFunction === 'function') {
-                return processFunction(this._currentDefinitions);
-            }
-
-            return this._currentDefinitions;
-        }
-
-        /**
          * @param {string} key
+         * @param {string} [id='null']
          * @returns {boolean}
          */
 
     }, {
         key: 'enabled',
         value: function enabled(key) {
-            return this._resolveValue(this._currentDefinitions[key]);
-        }
-    }, {
-        key: '_resolveValue',
-        value: function _resolveValue(value) {
+            var id = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'null';
 
-            if (typeof value === 'boolean') {
-                return value;
-            } else if (Array.isArray(value)) {
-                return value.indexOf(this._environment) >= 0;
+            if (id in this._currentDefinitions) {
+                return this._currentDefinitions[id][key];
             }
-
-            return this._defaultValue;
+            return this._currentDefinitions.null[key];
         }
     }]);
 

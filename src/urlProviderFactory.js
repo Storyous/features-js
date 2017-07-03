@@ -6,12 +6,8 @@
  * @returns {Promise.<DefinitionProvider>}
  */
 function urlProviderFactory (fetch, url) {
-    return (previous) => {
-        if (previous) {
-            return Promise.resolve(previous);
-        }
-        return fetch(url).then(res => res.json());
-    };
+    return () => fetch(url)
+        .then(res => res.json());
 }
 
 module.exports = urlProviderFactory;
