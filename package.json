@@ -1,6 +1,6 @@
 {
   "name": "@storyous/features",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "main": "./dist/index.js",
   "scripts": {
     "test": "npm run test:lint && npm run test:coverage && npm run test:coverage:threshold",
