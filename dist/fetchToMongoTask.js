@@ -31,6 +31,8 @@ var FetchToMongoTask = function (_cronious$Task) {
 
         _this._sourceUrl = options.sourceUrl;
 
+        _this._collection = options.collection;
+
         _this._lifetime = options.lifetime || 30000;
 
         _this._documentId = options.documentId || defaultDocumentId;

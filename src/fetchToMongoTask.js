@@ -21,6 +21,8 @@ class FetchToMongoTask extends cronious.Task {
 
         this._sourceUrl = options.sourceUrl;
 
+        this._collection = options.collection;
+
         this._lifetime = options.lifetime || 30000;
 
         this._documentId = options.documentId || defaultDocumentId;
