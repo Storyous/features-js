@@ -45,16 +45,4 @@ describe('urlProviderFactory', function () {
         });
     });
 
-    it('should just return previous value if exists', function () {
-        const expectedData = {};
-        const fetcher = createFetcher(testUrl, Promise.reject('This should not be called'));
-        const provider = urlProviderFactory(fetcher, testUrl);
-
-        return provider(expectedData).then((data) => {
-            assert.deepEqual(data, expectedData, 'Definition does not match');
-            assert(fetcher.notCalled);
-        });
-    });
-
-
 });

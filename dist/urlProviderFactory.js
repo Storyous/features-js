@@ -7,14 +7,11 @@
  */
 
 function urlProviderFactory(fetch, url) {
-    return function (previous) {
-        if (previous) {
-            return Promise.resolve(previous);
-        }
-        return fetch(url).then(function (res) {
-            return res.json();
-        });
-    };
+  return function () {
+    return fetch(url).then(function (res) {
+      return res.json();
+    });
+  };
 }
 
 module.exports = urlProviderFactory;

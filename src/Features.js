@@ -1,12 +1,11 @@
 'use strict';
 
 /**
- * @typedef {Object.<string, string[]|boolean>} FeatureDefinitions
+ * @typedef {Object.<string, Object.<string, boolean>>} FeatureDefinitions
  */
 
 /**
  * @callback DefinitionProvider
- * @param {FeatureDefinitions} [freshDefinitions=null]
  * @returns {Promise.<FeatureDefinitions>}
  */
 
@@ -14,36 +13,23 @@ class Features {
 
     /**
      * @param {{
-     *    defaultValue: *
-     *    environment: string
-     *    providers: DefinitionProvider[]
+     *    provider: DefinitionProvider
      *    cacheLifetime: number|null,
      *    onError?: Function
      *    onDefinitionsChange?: Function
      * }} options
-     * @param {FeatureDefinitions} [initialValue={}]
      */
-    constructor (options, initialValue = {}) {
+    constructor (options) {
 
         /**
          * @type {FeatureDefinitions}
          */
-        this._currentDefinitions = initialValue;
+        this._currentDefinitions = { null: {} };
 
         /**
-         * @type {string}
+         * @type {DefinitionProvider}
          */
-        this._environment = options.environment;
-
-        /**
-         * @type {*}
-         */
-        this._defaultValue = options.defaultValue;
-
-        /**
-         * @type {DefinitionProvider[]}
-         */
-        this._providers = options.providers;
+        this._provider = options.provider;
 
         /**
          * @type {Function}
@@ -51,7 +37,7 @@ class Features {
         this._onError = options.onError || null;
 
         /**
-         * @type {number}
+         * @type {number|null}
          */
         this._timeoutId = null;
 
@@ -69,33 +55,22 @@ class Features {
     }
 
     _loadDefinitionsRepetitively () {
-        let lastValue;
-        return this._providers.reduce((previous, provider) =>
-                previous.then((def) => {
-                    lastValue = def;
-                    return provider(def);
-                }).catch((err) => {
-                    if (this._onError) {
-                        this._onError(err);
+        return this._provider()
+            .catch(() => null)
+            .then((def) => {
+                if (def) {
+                    this._currentDefinitions = def;
+                    if (this._onDefinitionsChange) {
+                        this._onDefinitionsChange(def);
                     }
-                    return lastValue;
                 }
-            ),
-            Promise.resolve(null)
-        ).then((def) => {
-            if (def) {
-                this._currentDefinitions = def;
-                if (this._onDefinitionsChange) {
-                    this._onDefinitionsChange(def);
+                if (typeof this._cacheLifetime === 'number') {
+                    this._timeoutId = setTimeout(
+                        () => this._loadDefinitionsRepetitively(),
+                        this._cacheLifetime
+                    );
                 }
-            }
-            if (typeof this._cacheLifetime === 'number') {
-                this._timeoutId = setTimeout(
-                    () => this._loadDefinitionsRepetitively(),
-                    this._cacheLifetime
-                );
-            }
-        });
+            });
     }
 
     /**
@@ -116,36 +91,15 @@ class Features {
     }
 
     /**
-     * @param {Function} [processFunction]
-     * @returns {FeatureDefinitions}
-     */
-    getFeatureDefinitions (processFunction) {
-
-        if (typeof processFunction === 'function') {
-            return processFunction(this._currentDefinitions);
-        }
-
-        return this._currentDefinitions;
-    }
-
-    /**
      * @param {string} key
+     * @param {string} [id='null']
      * @returns {boolean}
      */
-    enabled (key) {
-        return this._resolveValue(this._currentDefinitions[key]);
-    }
-
-    _resolveValue (value) {
-
-        if (typeof value === 'boolean') {
-            return value;
-
-        } else if (Array.isArray(value)) {
-            return value.indexOf(this._environment) >= 0;
+    enabled (key, id = 'null') {
+        if (id in this._currentDefinitions) {
+            return this._currentDefinitions[id][key] || false;
         }
-
-        return this._defaultValue;
+        return this._currentDefinitions.null[key] || false;
     }
 
 }
