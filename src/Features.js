@@ -56,7 +56,12 @@ class Features {
 
     _loadDefinitionsRepetitively () {
         return this._provider()
-            .catch(() => null)
+            .catch((err) => {
+                if (this._onError) {
+                    this._onError(err);
+                }
+                return null;
+            })
             .then((def) => {
                 if (def) {
                     this._currentDefinitions = def;

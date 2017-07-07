@@ -12,7 +12,7 @@ function urlProviderFactory(fetch, url) {
 
     return function () {
         return fetch(url, fetchOptions).then(function (res) {
-            if (res.status < 200 && res.status >= 300) {
+            if (res.status < 200 || res.status >= 300) {
                 throw new Error('The source url response status is not OK');
             }
             return res.json();

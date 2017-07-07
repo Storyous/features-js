@@ -64,7 +64,10 @@ var Features = function () {
         value: function _loadDefinitionsRepetitively() {
             var _this = this;
 
-            return this._provider().catch(function () {
+            return this._provider().catch(function (err) {
+                if (_this._onError) {
+                    _this._onError(err);
+                }
                 return null;
             }).then(function (def) {
                 if (def) {
