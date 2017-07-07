@@ -1,13 +1,16 @@
 'use strict';
 
 /**
- * @param fetch - fetch API compatible function
- * @param url
+ * @param {Function} fetch - fetch API compatible function
+ * @param {string} url
+ * @param {Object} [fetchOptions={}]
  * @returns {Promise.<DefinitionProvider>}
  */
 
 function urlProviderFactory(fetch, url) {
-  return () => fetch(url).then(res => res.json());
+  let fetchOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  return () => fetch(url, fetchOptions).then(res => res.json());
 }
 
 module.exports = urlProviderFactory;

@@ -1,12 +1,13 @@
 'use strict';
 
 /**
- * @param fetch - fetch API compatible function
- * @param url
+ * @param {Function} fetch - fetch API compatible function
+ * @param {string} url
+ * @param {Object} [fetchOptions={}]
  * @returns {Promise.<DefinitionProvider>}
  */
-function urlProviderFactory (fetch, url) {
-    return () => fetch(url)
+function urlProviderFactory (fetch, url, fetchOptions = {}) {
+    return () => fetch(url, fetchOptions)
         .then(res => res.json());
 }
 
