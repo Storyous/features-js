@@ -11,6 +11,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var cronious = require('cronious');
 var nodeFetch = require('node-fetch');
 var defaultDocumentId = require('./defaultDocumentId');
+var urlProviderFactory = require('./urlProviderFactory');
 
 var FetchToMongoTask = function (_cronious$Task) {
     _inherits(FetchToMongoTask, _cronious$Task);
@@ -19,6 +20,7 @@ var FetchToMongoTask = function (_cronious$Task) {
      * @param {{
      *    sourceUrl: string,
      *    collection: mongodb.Collection
+     *    fetchOptions?: Object,
      *    documentId?: string
      *    taskId?: string
      *    lifetime?: number,
@@ -29,13 +31,14 @@ var FetchToMongoTask = function (_cronious$Task) {
 
         var _this = _possibleConstructorReturn(this, (FetchToMongoTask.__proto__ || Object.getPrototypeOf(FetchToMongoTask)).call(this, options.taskId || 'FetchToMongoTask'));
 
-        _this._sourceUrl = options.sourceUrl;
-
         _this._collection = options.collection;
 
         _this._lifetime = options.lifetime || 30000;
 
         _this._documentId = options.documentId || defaultDocumentId;
+
+        _this._provider = urlProviderFactory(nodeFetch, options.sourceUrl, options.fetchOptions || {});
+
         return _this;
     }
 
@@ -44,9 +47,7 @@ var FetchToMongoTask = function (_cronious$Task) {
         value: function run() {
             var _this2 = this;
 
-            return nodeFetch(this._sourceUrl).then(function (res) {
-                return res.json();
-            }).then(function (definitions) {
+            return this._provider().then(function (definitions) {
                 return _this2._collection.findOneAndUpdate({ _id: _this2._documentId }, definitions, { upsert: true });
             });
         }

@@ -3,6 +3,7 @@
 const cronious = require('cronious');
 const nodeFetch = require('node-fetch');
 const defaultDocumentId = require('./defaultDocumentId');
+const urlProviderFactory = require('./urlProviderFactory');
 
 class FetchToMongoTask extends cronious.Task {
 
@@ -10,6 +11,7 @@ class FetchToMongoTask extends cronious.Task {
      * @param {{
      *    sourceUrl: string,
      *    collection: mongodb.Collection
+     *    fetchOptions?: Object,
      *    documentId?: string
      *    taskId?: string
      *    lifetime?: number,
@@ -19,18 +21,22 @@ class FetchToMongoTask extends cronious.Task {
 
         super(options.taskId || 'FetchToMongoTask');
 
-        this._sourceUrl = options.sourceUrl;
-
         this._collection = options.collection;
 
         this._lifetime = options.lifetime || 30000;
 
         this._documentId = options.documentId || defaultDocumentId;
+
+        this._provider = urlProviderFactory(
+            nodeFetch,
+            options.sourceUrl,
+            options.fetchOptions || {}
+        );
+
     }
 
     run () {
-        return nodeFetch(this._sourceUrl)
-            .then(res => res.json())
+        return this._provider()
             .then(definitions => this._collection.findOneAndUpdate(
                 { _id: this._documentId },
                 definitions,
