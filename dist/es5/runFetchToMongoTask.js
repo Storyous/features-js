@@ -5,7 +5,7 @@ var FetchToMongoTask = require('./fetchToMongoTask');
 
 /**
  * @param {{
-     *    sourceUrl: string,
+     *    sourceUrl: (string|string[]|function (): Promise.<string[]>|function (): Promise.<string>)
      *    collection: mongodb.Collection
      *    documentId?: string
      *    taskId?: string

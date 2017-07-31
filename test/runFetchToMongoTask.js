@@ -71,4 +71,74 @@ describe('runFetchToMongoTask', function () {
                 assert(definitionChange.called);
             });
     });
+
+    it('should run task properly, fetch data from multiple urls and store them into DB', function () {
+
+        const sourcePath = '/api/features';
+        const sourceUrls = () => Promise.resolve({
+            null: `http://localhost:5000${sourcePath}`,
+            a1: `http://localhost:5000${sourcePath}?a=1`,
+            a2: `http://localhost:5000${sourcePath}?a=2`
+        });
+        const taskOptions = { sourceUrl: sourceUrls, collection, lifetime: 1 };
+        let taskStopObject = null;
+        let featureService = null;
+
+        const definitionChange = sinon.spy();
+
+        mockServer
+            .handleNext(sourcePath, (req, res) => {
+                // todo check the query
+                res.json({
+                    nullFeature: true,
+                    a1Feature: false,
+                    a2Feature: false
+                });
+            })
+            .handleNext(sourcePath, (req, res) => {
+                // todo check the query
+                res.json({
+                    nullFeature: false,
+                    a1Feature: true,
+                    a2Feature: false
+                });
+            })
+            .handleNext(sourcePath, (req, res) => {
+                // todo check the query
+                res.json({
+                    nullFeature: false,
+                    a1Feature: false,
+                    a2Feature: true
+                });
+            });
+
+        return runFetchToMongoTask(taskOptions)
+            .then((stopObject) => {
+                taskStopObject = stopObject;
+                return wait(100);
+            })
+            .then(() => taskStopObject.stopFetchToMongoTask())
+            .then(() => {
+
+                featureService = new features.Features({
+                    provider: features.mongoProviderFactory(collection),
+                    onDefinitionsChange: definitionChange
+                });
+
+                return featureService.getReadyPromise();
+            })
+            .then(() => {
+                assert.equal(featureService.enabled('nullFeature'), true);
+                assert.equal(featureService.enabled('a1Feature'), false);
+                assert.equal(featureService.enabled('a2Feature'), false);
+                assert.equal(featureService.enabled('nullFeature', 'a1'), false);
+                assert.equal(featureService.enabled('a1Feature', 'a1'), true);
+                assert.equal(featureService.enabled('a2Feature', 'a1'), false);
+                assert.equal(featureService.enabled('nullFeature', 'a2'), false);
+                assert.equal(featureService.enabled('a1Feature', 'a2'), false);
+                assert.equal(featureService.enabled('a2Feature', 'a2'), true);
+
+                assert(definitionChange.called);
+            });
+    });
 });
