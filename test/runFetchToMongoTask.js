@@ -80,7 +80,7 @@ describe('runFetchToMongoTask', function () {
             a1: `http://localhost:5000${sourcePath}?a=1`,
             a2: `http://localhost:5000${sourcePath}?a=2`
         });
-        const taskOptions = { sourceUrl: sourceUrls, collection, lifetime: 1 };
+        const taskOptions = { sourceUrl: sourceUrls, collection, lifetime: -100 };
         let taskStopObject = null;
         let featureService = null;
 
