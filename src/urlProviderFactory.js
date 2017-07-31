@@ -42,7 +42,8 @@ function urlProviderFactory (fetch, source, fetchOptions = {}) {
                     }), Promise.resolve()).then(() => result);
 
                 } else if (typeof oneOrMoreUrls === 'string') {
-                    return fetchUrl(fetch, oneOrMoreUrls, fetchOptions);
+                    return fetchUrl(fetch, oneOrMoreUrls, fetchOptions)
+                        .then(urlResult => ({ null: urlResult }));
                 }
 
                 throw new Error('Unsupported url type');

@@ -47,7 +47,9 @@ function urlProviderFactory(fetch, source) {
                     return result;
                 });
             } else if (typeof oneOrMoreUrls === 'string') {
-                return fetchUrl(fetch, oneOrMoreUrls, fetchOptions);
+                return fetchUrl(fetch, oneOrMoreUrls, fetchOptions).then(function (urlResult) {
+                    return { null: urlResult };
+                });
             }
 
             throw new Error('Unsupported url type');

@@ -21,9 +21,9 @@ describe('urlProviderFactory', function () {
     });
 
 
-    it('should return object from url', function () {
-        const expectedData = {};
-        const fetcher = createFetcher(testUrl, expectedData);
+    it('should return object from url as null (fallback) property', function () {
+        const expectedData = { null: {} };
+        const fetcher = createFetcher(testUrl, expectedData.null);
         const provider = urlProviderFactory(fetcher, testUrl);
 
         return provider().then((data) => {

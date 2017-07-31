@@ -48,7 +48,7 @@ describe('runFetchToMongoTask', function () {
         const definitionChange = sinon.spy();
 
         mockServer.handleNext(sourcePath, (req, res) => {
-            res.json({ null: { feature1: true } });
+            res.json({ feature1: true });
         });
 
         return runFetchToMongoTask(taskOptions)
