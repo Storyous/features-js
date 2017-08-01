@@ -1,6 +1,6 @@
 {
   "name": "@storyous/features",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "dependencies": {
     "abbrev": {
       "version": "1.0.9",
