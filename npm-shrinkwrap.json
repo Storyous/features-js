@@ -593,9 +593,9 @@
       "dev": true
     },
     "cronious": {
-      "version": "1.6.0",
+      "version": "1.6.1",
       "from": "cronious@latest",
-      "resolved": "https://registry.npmjs.org/cronious/-/cronious-1.6.0.tgz"
+      "resolved": "https://registry.npmjs.org/cronious/-/cronious-1.6.1.tgz"
     },
     "cross-env": {
       "version": "4.0.0",

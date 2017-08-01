@@ -35,8 +35,8 @@ class FetchToMongoTask extends cronious.Task {
 
     }
 
-    run () {
-        return this._provider()
+    run (progressCallback) {
+        return this._provider(progressCallback)
             .then(definitions => this._collection.findOneAndUpdate(
                 { _id: this._documentId },
                 definitions,
