@@ -24,7 +24,10 @@ function urlProviderFactory(fetch, source) {
         urlProvider = () => source;
     }
 
-    return () => {
+    /**
+     * @param {Function} [callback]
+     */
+    return progressCallback => {
         const deferredUrls = urlProvider();
         return Promise.resolve(deferredUrls).then(oneOrMoreUrls => {
 
@@ -36,6 +39,9 @@ function urlProviderFactory(fetch, source) {
                     const url = oneOrMoreUrls[key];
                     return fetchUrl(fetch, url, fetchOptions).then(urlResult => {
                         result[key] = urlResult;
+                        if (progressCallback) {
+                            progressCallback();
+                        }
                     });
                 }), Promise.resolve()).then(() => result);
             } else if (typeof oneOrMoreUrls === 'string') {

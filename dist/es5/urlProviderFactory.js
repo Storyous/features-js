@@ -28,7 +28,10 @@ function urlProviderFactory(fetch, source) {
         };
     }
 
-    return function () {
+    /**
+     * @param {Function} [callback]
+     */
+    return function (progressCallback) {
         var deferredUrls = urlProvider();
         return Promise.resolve(deferredUrls).then(function (oneOrMoreUrls) {
 
@@ -41,6 +44,9 @@ function urlProviderFactory(fetch, source) {
                         var url = oneOrMoreUrls[key];
                         return fetchUrl(fetch, url, fetchOptions).then(function (urlResult) {
                             result[key] = urlResult;
+                            if (progressCallback) {
+                                progressCallback();
+                            }
                         });
                     });
                 }, Promise.resolve()).then(function () {

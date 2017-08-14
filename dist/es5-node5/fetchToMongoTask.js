@@ -30,8 +30,8 @@ class FetchToMongoTask extends cronious.Task {
         this._provider = urlProviderFactory(nodeFetch, options.sourceUrl, options.fetchOptions || {});
     }
 
-    run() {
-        return this._provider().then(definitions => this._collection.findOneAndUpdate({ _id: this._documentId }, definitions, { upsert: true }));
+    run(progressCallback) {
+        return this._provider(progressCallback).then(definitions => this._collection.findOneAndUpdate({ _id: this._documentId }, definitions, { upsert: true }));
     }
 
     getNextTime() {

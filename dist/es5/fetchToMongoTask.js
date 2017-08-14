@@ -44,10 +44,10 @@ var FetchToMongoTask = function (_cronious$Task) {
 
     _createClass(FetchToMongoTask, [{
         key: 'run',
-        value: function run() {
+        value: function run(progressCallback) {
             var _this2 = this;
 
-            return this._provider().then(function (definitions) {
+            return this._provider(progressCallback).then(function (definitions) {
                 return _this2._collection.findOneAndUpdate({ _id: _this2._documentId }, definitions, { upsert: true });
             });
         }
