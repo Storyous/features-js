@@ -2,8 +2,8 @@
 
 const cronious = require('cronious');
 const nodeFetch = require('node-fetch');
-const defaultDocumentId = require('./defaultDocumentId');
 const urlProviderFactory = require('./urlProviderFactory');
+const mongodb = require('mongodb');
 
 class FetchToMongoTask extends cronious.Task {
 
@@ -12,7 +12,6 @@ class FetchToMongoTask extends cronious.Task {
      *    sourceUrl: string,
      *    collection: mongodb.Collection
      *    fetchOptions?: Object,
-     *    documentId?: string
      *    taskId?: string
      *    lifetime?: number,
      * }} options
@@ -25,8 +24,6 @@ class FetchToMongoTask extends cronious.Task {
 
         this._lifetime = options.lifetime || 30000;
 
-        this._documentId = options.documentId || defaultDocumentId;
-
         this._provider = urlProviderFactory(
             nodeFetch,
             options.sourceUrl,
@@ -37,11 +34,35 @@ class FetchToMongoTask extends cronious.Task {
 
     run (progressCallback) {
         return this._provider(progressCallback)
-            .then(definitions => this._collection.findOneAndUpdate(
-                { _id: this._documentId },
-                definitions,
-                { upsert: true }
-            ));
+            .then((definitions) => {
+
+                const changeId = new mongodb.ObjectId();
+                const updates = Object.keys(definitions).map((key) => {
+                    const newDocument = {
+                        _id: key,
+                        changeId,
+                        type: 'features',
+                        definitions: definitions[key]
+                    };
+
+                    return {
+                        updateOne: {
+                            filter: { _id: key },
+                            update: newDocument,
+                            upsert: true
+                        }
+                    };
+                });
+
+                return this._collection.bulkWrite(updates)
+                    .then(() => this._collection.removeMany({
+                        // null because of other document without feature flags, CRON for example
+                        changeId: {
+                            type: 'features',
+                            $ne: changeId
+                        }
+                    }));
+            });
     }
 
     getNextTime () {
