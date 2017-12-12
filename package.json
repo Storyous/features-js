@@ -1,6 +1,6 @@
 {
   "name": "@storyous/features",
-  "version": "2.3.4",
+  "version": "3.0.0",
   "main": "./dist/es5-node5/index.js",
   "scripts": {
     "test": "npm run test:lint && npm run test:coverage && npm run test:coverage:threshold",
