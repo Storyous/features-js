@@ -54,7 +54,7 @@ class FetchToMongoTask extends cronious.Task {
                     };
                 });
 
-                return this._collection.bulkWrite(updates)
+                return this._collection.bulkWrite(updates, { ordered: false })
                     .then(() => this._collection.removeMany({
                         // null because of other document without feature flags, CRON for example
                         changeId: {
