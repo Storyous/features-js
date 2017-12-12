@@ -51,6 +51,7 @@
   "description": "",
   "dependencies": {
     "cronious": "^1.6.1",
-    "node-fetch": "^1.7.1"
+    "node-fetch": "^1.7.1",
+    "uuid": "^3.1.0"
   }
 }

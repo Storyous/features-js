@@ -3,7 +3,7 @@
 const cronious = require('cronious');
 const nodeFetch = require('node-fetch');
 const urlProviderFactory = require('./urlProviderFactory');
-const mongodb = require('mongodb');
+const uuid = require('uuid');
 
 class FetchToMongoTask extends cronious.Task {
 
@@ -36,7 +36,7 @@ class FetchToMongoTask extends cronious.Task {
         return this._provider(progressCallback)
             .then((definitions) => {
 
-                const changeId = new mongodb.ObjectId();
+                const changeId = uuid.v4(); // random
                 const updates = Object.keys(definitions).map((key) => {
                     const newDocument = {
                         _id: key,

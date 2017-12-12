@@ -11,7 +11,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var cronious = require('cronious');
 var nodeFetch = require('node-fetch');
 var urlProviderFactory = require('./urlProviderFactory');
-var mongodb = require('mongodb');
+var uuid = require('uuid');
 
 var FetchToMongoTask = function (_cronious$Task) {
     _inherits(FetchToMongoTask, _cronious$Task);
@@ -46,7 +46,7 @@ var FetchToMongoTask = function (_cronious$Task) {
 
             return this._provider(progressCallback).then(function (definitions) {
 
-                var changeId = new mongodb.ObjectId();
+                var changeId = uuid.v4(); // random
                 var updates = Object.keys(definitions).map(function (key) {
                     var newDocument = {
                         _id: key,
