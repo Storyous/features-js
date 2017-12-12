@@ -1,25 +1,23 @@
 'use strict';
 
-const defaultDocumentId = require('./defaultDocumentId');
-
 /**
  * @param {mongodb.Collection} collection
- * @param documentId
  * @returns {DefinitionProvider}
  */
-function mongoProviderFactory (collection, documentId = defaultDocumentId) {
-
-    const query = { _id: documentId };
-
-    return () => collection.find(query)
-        .limit(1)
+function mongoProviderFactory (collection) {
+    return () => collection.find({ type: 'features' })
         .toArray()
         .then((docs) => {
-            const definitions = docs[0];
-            if (!definitions) {
+
+            if (!docs.length) {
                 return null;
             }
-            delete definitions._id;
+
+            const definitions = {};
+            docs.forEach((doc) => {
+                definitions[doc._id] = doc.definitions;
+            });
+
             return definitions;
         });
 }

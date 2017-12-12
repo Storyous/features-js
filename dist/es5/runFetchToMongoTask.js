@@ -7,7 +7,6 @@ var FetchToMongoTask = require('./fetchToMongoTask');
  * @param {{
      *    sourceUrl: (string|string[]|function (): Promise.<string[]>|function (): Promise.<string>)
      *    collection: mongodb.Collection
-     *    documentId?: string
      *    taskId?: string
      *    lifetime?: number,
      * }} taskOptions

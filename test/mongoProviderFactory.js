@@ -7,7 +7,6 @@ const assert = require('assert');
 describe('mongoProviderFactory', function () {
 
     let collection;
-    const id = 'features';
 
     before(function () {
         return mongodb.connect('mongodb://127.0.0.1:27017/featuresJsTests')
@@ -22,7 +21,7 @@ describe('mongoProviderFactory', function () {
 
     it('should return null when the doc is missing', function () {
         const expectedData = null;
-        const provider = mongoProviderFactory(collection, id);
+        const provider = mongoProviderFactory(collection);
 
         return provider().then((data) => {
             assert.deepEqual(data, expectedData, 'Definition does not match');
@@ -31,18 +30,14 @@ describe('mongoProviderFactory', function () {
 
     it('should return and save previous value if exists', function () {
         const expectedData = { null: { featureId: true } };
-        const provider = mongoProviderFactory(collection, id);
+        const provider = mongoProviderFactory(collection);
 
-        return collection.insertOne(Object.assign({ _id: id }, expectedData))
+        return collection.insertOne({ _id: 'null', type: 'features', definitions: expectedData.null })
             .then(() => provider())
             .then((data) => {
 
                 assert.deepEqual(data, expectedData, 'Definition while saving does not match');
 
-                return provider();
-            })
-            .then((data) => {
-                assert.deepEqual(data, expectedData, 'Definition with loading does not match');
             });
     });
 

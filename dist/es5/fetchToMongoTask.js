@@ -10,8 +10,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var cronious = require('cronious');
 var nodeFetch = require('node-fetch');
-var defaultDocumentId = require('./defaultDocumentId');
 var urlProviderFactory = require('./urlProviderFactory');
+var mongodb = require('mongodb');
 
 var FetchToMongoTask = function (_cronious$Task) {
     _inherits(FetchToMongoTask, _cronious$Task);
@@ -21,7 +21,6 @@ var FetchToMongoTask = function (_cronious$Task) {
      *    sourceUrl: string,
      *    collection: mongodb.Collection
      *    fetchOptions?: Object,
-     *    documentId?: string
      *    taskId?: string
      *    lifetime?: number,
      * }} options
@@ -35,8 +34,6 @@ var FetchToMongoTask = function (_cronious$Task) {
 
         _this._lifetime = options.lifetime || 30000;
 
-        _this._documentId = options.documentId || defaultDocumentId;
-
         _this._provider = urlProviderFactory(nodeFetch, options.sourceUrl, options.fetchOptions || {});
 
         return _this;
@@ -48,7 +45,34 @@ var FetchToMongoTask = function (_cronious$Task) {
             var _this2 = this;
 
             return this._provider(progressCallback).then(function (definitions) {
-                return _this2._collection.findOneAndUpdate({ _id: _this2._documentId }, definitions, { upsert: true });
+
+                var changeId = new mongodb.ObjectId();
+                var updates = Object.keys(definitions).map(function (key) {
+                    var newDocument = {
+                        _id: key,
+                        changeId: changeId,
+                        type: 'features',
+                        definitions: definitions[key]
+                    };
+
+                    return {
+                        updateOne: {
+                            filter: { _id: key },
+                            update: newDocument,
+                            upsert: true
+                        }
+                    };
+                });
+
+                return _this2._collection.bulkWrite(updates, { ordered: false }).then(function () {
+                    return _this2._collection.removeMany({
+                        // null because of other document without feature flags, CRON for example
+                        changeId: {
+                            type: 'features',
+                            $ne: changeId
+                        }
+                    });
+                });
             });
         }
     }, {
