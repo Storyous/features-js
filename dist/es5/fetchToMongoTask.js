@@ -67,8 +67,8 @@ var FetchToMongoTask = function (_cronious$Task) {
                 return _this2._collection.bulkWrite(updates, { ordered: false }).then(function () {
                     return _this2._collection.removeMany({
                         // null because of other document without feature flags, CRON for example
+                        type: 'features',
                         changeId: {
-                            type: 'features',
                             $ne: changeId
                         }
                     });
