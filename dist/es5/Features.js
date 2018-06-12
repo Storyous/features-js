@@ -159,7 +159,7 @@ var Features = function () {
             }).then(function (definitions) {
 
                 if (definitions) {
-                    return definitions[key];
+                    return definitions[key] || false;
                 }
 
                 return _this2._currentDefinitions.null[key] || false;
