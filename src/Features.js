@@ -140,7 +140,7 @@ class Features {
             .then((definitions) => {
 
                 if (definitions) {
-                    return definitions[key];
+                    return definitions[key] || false;
                 }
 
                 return this._currentDefinitions.null[key] || false;
