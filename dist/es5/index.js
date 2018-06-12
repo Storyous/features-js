@@ -4,6 +4,7 @@ var Features = require('./Features');
 var mongoProviderFactory = require('./mongoProviderFactory');
 var urlProviderFactory = require('./urlProviderFactory');
 var runFetchToMongoTask = require('./runFetchToMongoTask');
+var mongoCachedUrlProviderFactory = require('./mongoCachedUrlProviderFactory');
 
 module.exports = {
 
@@ -13,6 +14,8 @@ module.exports = {
 
     urlProviderFactory: urlProviderFactory,
 
-    runFetchToMongoTask: runFetchToMongoTask
+    runFetchToMongoTask: runFetchToMongoTask,
+
+    mongoCachedUrlProviderFactory: mongoCachedUrlProviderFactory
 
 };

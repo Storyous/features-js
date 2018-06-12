@@ -9,6 +9,12 @@
  * @returns {Promise.<FeatureDefinitions>}
  */
 
+/**
+ * @callback DefinitionProviderByUrl
+ * @param {string} url
+ * @returns {Promise.<FeatureDefinitions>}
+ */
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -18,6 +24,7 @@ var Features = function () {
     /**
      * @param {{
      *    provider: DefinitionProvider
+     *    byUrlProvider?: DefinitionProviderByUrl
      *    cacheLifetime: number|null,
      *    onError?: Function
      *    onDefinitionsChange?: Function
@@ -35,6 +42,11 @@ var Features = function () {
          * @type {DefinitionProvider}
          */
         this._provider = options.provider;
+
+        /**
+         * @type {DefinitionProviderByUrl}
+         */
+        this._byUrlProvider = options.byUrlProvider;
 
         /**
          * @type {Function}
@@ -56,7 +68,11 @@ var Features = function () {
          */
         this._onDefinitionsChange = options.onDefinitionsChange || null;
 
-        this._firstLoadPromise = this._loadDefinitionsRepetitively();
+        if (this._provider) {
+            this._firstLoadPromise = this._loadDefinitionsRepetitively();
+        } else {
+            this._firstLoadPromise = Promise.resolve();
+        }
     }
 
     _createClass(Features, [{
@@ -122,6 +138,32 @@ var Features = function () {
                 return this._currentDefinitions[id][key] || false;
             }
             return this._currentDefinitions.null[key] || false;
+        }
+
+        /**
+         * @param {string} url
+         * @param {string} key
+         * @returns {Promise.<boolean>}
+         */
+
+    }, {
+        key: 'enabledByUrl',
+        value: function enabledByUrl(url, key) {
+            var _this2 = this;
+
+            return this._byUrlProvider(url).catch(function (err) {
+                if (_this2._onError) {
+                    _this2._onError(err);
+                }
+                return null;
+            }).then(function (definitions) {
+
+                if (definitions) {
+                    return definitions[key];
+                }
+
+                return _this2._currentDefinitions.null[key] || false;
+            });
         }
     }]);
 

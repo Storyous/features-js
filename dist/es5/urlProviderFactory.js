@@ -2,14 +2,7 @@
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-function fetchUrl(fetch, url, fetchOptions) {
-    return fetch(url, fetchOptions).then(function (res) {
-        if (res.status < 200 || res.status >= 300) {
-            throw new Error('The source url response status is not OK');
-        }
-        return res.json();
-    });
-}
+var fetchUrl = require('./fetchUrl');
 
 /**
  * @param {Function} fetch - fetch API compatible function

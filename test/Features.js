@@ -74,4 +74,84 @@ describe('Features', function () {
 
     });
 
+    describe('enabledByUrl', () => {
+
+        it('should call byUrlProvider and return flag', () => {
+
+            const definitions = {
+                feature1: true,
+                feature2: false
+            };
+
+            const byUrlProvider = sinon.spy(async () => definitions);
+
+            features = new Features({
+                cacheLifetime: 1,
+                byUrlProvider
+            });
+
+            const url = 'https://google.com';
+
+            return features.getReadyPromise()
+                .then(() => features.enabledByUrl(url, 'feature1'))
+                .then((feature1) => {
+                    assert(byUrlProvider.calledOnce);
+                    assert(byUrlProvider.calledWith(url));
+                    assert.equal(feature1, true);
+
+                    return features.enabledByUrl(url, 'feature2');
+                })
+                .then((feature2) => {
+                    assert(byUrlProvider.calledTwice);
+                    assert.equal(feature2, false);
+                });
+
+        });
+
+        it('should work with failing byUrlProvider and return false', () => {
+
+            const byUrlProvider = sinon.spy(async () => {
+                throw Error('Some error');
+            });
+
+            features = new Features({
+                cacheLifetime: 1,
+                byUrlProvider
+            });
+
+            const url = 'https://google.com';
+
+            return features.getReadyPromise()
+                .then(() => features.enabledByUrl(url, 'feature1'))
+                .then((feature1) => {
+                    assert(byUrlProvider.calledOnce);
+                    assert(byUrlProvider.calledWith(url));
+                    assert.equal(feature1, false);
+                });
+
+        });
+
+        it('should work with null definitions returned by byUrlProvider', () => {
+
+            const byUrlProvider = sinon.spy(async () => null);
+
+            features = new Features({
+                cacheLifetime: 1,
+                byUrlProvider
+            });
+
+            const url = 'https://google.com';
+
+            return features.getReadyPromise()
+                .then(() => features.enabledByUrl(url, 'feature1'))
+                .then((feature1) => {
+                    assert(byUrlProvider.calledOnce);
+                    assert(byUrlProvider.calledWith(url));
+                    assert.equal(feature1, false);
+                });
+
+        });
+
+    });
+
 });
