@@ -9,11 +9,18 @@
  * @returns {Promise.<FeatureDefinitions>}
  */
 
+/**
+ * @callback DefinitionProviderByUrl
+ * @param {string} url
+ * @returns {Promise.<FeatureDefinitions>}
+ */
+
 class Features {
 
     /**
      * @param {{
      *    provider: DefinitionProvider
+     *    asyProvider: DefinitionProviderByUrl
      *    cacheLifetime: number|null,
      *    onError?: Function
      *    onDefinitionsChange?: Function
@@ -30,6 +37,11 @@ class Features {
          * @type {DefinitionProvider}
          */
         this._provider = options.provider;
+
+        /**
+         * @type {DefinitionProviderByUrl}
+         */
+        this._byUrlProvider = options.byUrlProvider;
 
         /**
          * @type {Function}
@@ -102,6 +114,27 @@ class Features {
             return this._currentDefinitions[id][key] || false;
         }
         return this._currentDefinitions.null[key] || false;
+    }
+
+    /**
+     * @param {string} url
+     * @param {string} key
+     * @returns {Promise.<boolean>}
+     */
+    async enabledByUrl(url, key) {
+        try {
+            const definitions = await this._byUrlProvider(url);
+
+            if (definitions) {
+                return definitions[key];
+            }
+        } catch (err) {
+            if (this._onError) {
+                this._onError(err);
+            }
+        }
+
+        return this._currentDefinitions.null[key];
     }
 
 }

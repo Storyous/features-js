@@ -9,11 +9,18 @@
  * @returns {Promise.<FeatureDefinitions>}
  */
 
+/**
+ * @callback DefinitionProviderByUrl
+ * @param {string} url
+ * @returns {Promise.<FeatureDefinitions>}
+ */
+
 class Features {
 
     /**
      * @param {{
      *    provider: DefinitionProvider
+     *    byUrlProvider?: DefinitionProviderByUrl
      *    cacheLifetime: number|null,
      *    onError?: Function
      *    onDefinitionsChange?: Function
@@ -30,6 +37,11 @@ class Features {
          * @type {DefinitionProvider}
          */
         this._provider = options.provider;
+
+        /**
+         * @type {DefinitionProviderByUrl}
+         */
+        this._byUrlProvider = options.byUrlProvider;
 
         /**
          * @type {Function}
@@ -51,7 +63,12 @@ class Features {
          */
         this._onDefinitionsChange = options.onDefinitionsChange || null;
 
-        this._firstLoadPromise = this._loadDefinitionsRepetitively();
+        if (this._provider) {
+            this._firstLoadPromise = this._loadDefinitionsRepetitively();
+
+        } else {
+            this._firstLoadPromise = Promise.resolve();
+        }
     }
 
     _loadDefinitionsRepetitively () {
@@ -105,6 +122,29 @@ class Features {
             return this._currentDefinitions[id][key] || false;
         }
         return this._currentDefinitions.null[key] || false;
+    }
+
+    /**
+     * @param {string} url
+     * @param {string} key
+     * @returns {Promise.<boolean>}
+     */
+    enabledByUrl (url, key) {
+        return this._byUrlProvider(url)
+            .catch((err) => {
+                if (this._onError) {
+                    this._onError(err);
+                }
+                return null;
+            })
+            .then((definitions) => {
+
+                if (definitions) {
+                    return definitions[key];
+                }
+
+                return this._currentDefinitions.null[key] || false;
+            });
     }
 
 }
