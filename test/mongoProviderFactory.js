@@ -10,8 +10,8 @@ describe('mongoProviderFactory', function () {
 
     before(function () {
         return mongodb.connect('mongodb://127.0.0.1:27017/featuresJsTests')
-            .then((db) => {
-                collection = db.collection('featuresCollection');
+            .then((client) => {
+                collection = client.db().collection('featuresCollection');
             });
     });
 

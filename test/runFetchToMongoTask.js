@@ -19,8 +19,8 @@ describe('runFetchToMongoTask', function () {
     });
 
     before(function (done) {
-        return mongodb.connect('mongodb://127.0.0.1:27017/featuresJsTests', null, (err, db) => {
-            collection = db.collection('featuresCollection');
+        return mongodb.connect('mongodb://127.0.0.1:27017/featuresJsTests', null, (err, client) => {
+            collection = client.db().collection('featuresCollection');
             mockServer = new MockServer(5000, done);
         });
     });

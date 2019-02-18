@@ -41,7 +41,7 @@
     "express": "^4.15.3",
     "mocha": "^3.2.0",
     "mocha-istanbul": "^0.3.0",
-    "mongodb": "^2.2.25",
+    "mongodb": "^3.1.13",
     "node-fetch": "^1.6.3",
     "sinon": "^2.1.0"
   },

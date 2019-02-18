@@ -37,7 +37,7 @@ function mongoCachedUrlProviderFactory (fetch, collection, options = {}) {
                     },
                     documentMatcher
                 );
-                await collection.updateOne(documentMatcher, currentDefinitions, { upsert: true });
+                await collection.replaceOne(documentMatcher, currentDefinitions, { upsert: true });
 
             } catch (err) {
                 if (options.onError) {
