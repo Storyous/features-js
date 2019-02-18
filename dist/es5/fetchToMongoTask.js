@@ -56,9 +56,9 @@ var FetchToMongoTask = function (_cronious$Task) {
                     };
 
                     return {
-                        updateOne: {
+                        replaceOne: {
                             filter: { _id: key },
-                            update: newDocument,
+                            replacement: newDocument,
                             upsert: true
                         }
                     };
